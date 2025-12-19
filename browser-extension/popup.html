@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KronoSave Intelligence Capture</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      width: 350px;
+      min-height: 400px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: white;
+    }
+    
+    .header {
+      padding: 20px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .subtitle {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    
+    .content {
+      padding: 20px;
+    }
+    
+    .section {
+      margin-bottom: 24px;
+    }
+    
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #64b5f6;
+    }
+    
+    .api-key-section {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .api-input {
+      width: 100%;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      color: white;
+      font-size: 12px;
+    }
+    
+    .api-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .capture-button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+      margin-bottom: 16px;
+    }
+    
+    .capture-button:hover {
+      transform: translateY(-1px);
+    }
+    
+    .capture-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      text-align: center;
+    }
+    
+    .stat {
+      flex: 1;
+    }
+    
+    .stat-number {
+      font-size: 24px;
+      font-weight: bold;
+      color: #64b5f6;
+    }
+    
+    .stat-label {
+      font-size: 11px;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+    
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    
+    .quick-action {
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: white;
+      font-size: 11px;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.2s;
+    }
+    
+    .quick-action:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .status {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    
+    .status.connected {
+      background: rgba(40, 167, 69, 0.2);
+      border: 1px solid rgba(40, 167, 69, 0.3);
+      color: #28a745;
+    }
+    
+    .status.disconnected {
+      background: rgba(220, 53, 69, 0.2);
+      border: 1px solid rgba(220, 53, 69, 0.3);
+      color: #dc3545;
+    }
+    
+    .footer {
+      padding: 16px 20px;
+      text-align: center;
+      font-size: 10px;
+      opacity: 0.6;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .spinner {
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-top: 2px solid #64b5f6;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">🛡️ KronoSave</div>
+    <div class="subtitle">Intelligence Capture</div>
+  </div>
+  
+  <div class="content">
+    <div class="section">
+      <div class="section-title">Connection Status</div>
+      <div id="connectionStatus" class="status disconnected">Disconnected</div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Quick Capture</div>
+      <button id="captureButton" class="capture-button">
+        📸 Capture Current Page
+      </button>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Statistics</div>
+      <div class="stats">
+        <div class="stat">
+          <div id="capturedCount" class="stat-number">0</div>
+          <div class="stat-label">Captured</div>
+        </div>
+        <div class="stat">
+          <div id="processedCount" class="stat-number">0</div>
+          <div class="stat-label">Processed</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Quick Actions</div>
+      <div class="quick-actions">
+        <div class="quick-action" id="openDashboard">
+          📊 Dashboard
+        </div>
+        <div class="quick-action" id="openKnowledge">
+          🧠 Knowledge
+        </div>
+        <div class="quick-action" id="openTasks">
+          ✅ Tasks
+        </div>
+        <div class="quick-action" id="openAgents">
+          🤖 Agents
+        </div>
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">API Configuration</div>
+      <div class="api-key-section">
+        <input 
+          type="password" 
+          id="apiKey" 
+          class="api-input" 
+          placeholder="Enter KronoSave API Key"
+        >
+      </div>
+    </div>
+    
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <div>Processing...</div>
+    </div>
+  </div>
+  
+  <div class="footer">
+    Ctrl+Shift+C to capture • Powered by AI Agents
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
